@@ -1,15 +1,21 @@
 package com.studi.workshopmovieapp.view.adapter
 
 import android.content.Context
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.res.ResourcesCompat
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import com.studi.workshopmovieapp.model.Movie
 import com.studi.workshopmovieapp.R
+import com.studi.workshopmovieapp.model.Movie
+import com.studi.workshopmovieapp.util.getColorByOrder
+import com.studi.workshopmovieapp.view.fragment.MovieListFragmentDirections
 
 class MoviesAdapter(private val context: Context, private val movieList: List<Movie>): RecyclerView.Adapter<MoviesAdapter.ViewHolder>() {
 
@@ -32,8 +38,17 @@ class MoviesAdapter(private val context: Context, private val movieList: List<Mo
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val movie = movieList[position]
         holder.textView.text = movie.title
-        holder.imageView.setImageDrawable(
-            AppCompatResources.getDrawable(context, movie.poster)
-        )
+
+        val drawable = ResourcesCompat.getDrawable(context.resources, R.drawable.item_rounded_icon, null)
+        drawable?.colorFilter = PorterDuffColorFilter(context.getColorByOrder(position), PorterDuff.Mode.MULTIPLY)
+        holder.imageView.background = drawable
+
+        holder.itemView.setOnClickListener {
+            val action = MovieListFragmentDirections.actionMovieListFragmentToMovieDetail(
+                movieTitle = movie.title,
+                movieDescr = movie.descr
+            )
+            it.findNavController().navigate(action)
+        }
     }
 }
