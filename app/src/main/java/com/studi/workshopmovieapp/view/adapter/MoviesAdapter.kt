@@ -43,12 +43,5 @@ class MoviesAdapter(private val context: Context, private val movieList: List<Mo
         drawable?.colorFilter = PorterDuffColorFilter(context.getColorByOrder(position), PorterDuff.Mode.MULTIPLY)
         holder.imageView.background = drawable
 
-        holder.itemView.setOnClickListener {
-            val action = MovieListFragmentDirections.actionMovieListFragmentToMovieDetail(
-                movieTitle = movie.title,
-                movieDescr = movie.descr
-            )
-            it.findNavController().navigate(action)
-        }
     }
 }
