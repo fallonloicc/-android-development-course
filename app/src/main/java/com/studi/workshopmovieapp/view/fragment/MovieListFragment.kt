@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.studi.workshopmovieapp.R
@@ -14,15 +16,12 @@ import com.studi.workshopmovieapp.model.Movie
 import com.studi.workshopmovieapp.util.getRandomColor
 import com.studi.workshopmovieapp.view.activity.MainActivity
 import com.studi.workshopmovieapp.view.adapter.MoviesAdapter
+import com.studi.workshopmovieapp.viewmodel.MovieListViewmodel
 
 class MovieListFragment: Fragment() {
 
-    private val movieList: List<Movie> = listOf(
-        Movie("Bienvenue chez les chtis","Un film avec des Chtis"),
-        Movie("20 milles lieux sous les mers","Un film avec des mers"),
-        Movie("Prison Break", "Un prisonnier sympa")
-    )
-
+    lateinit var viewModel: MovieListViewmodel
+    lateinit var adapter: MoviesAdapter
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -34,8 +33,11 @@ class MovieListFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel = MovieListViewmodel(app = requireActivity().application)
+        initObserver()
+
         val recyclerView = view.findViewById<RecyclerView>(com.studi.workshopmovieapp.R.id.recycler_movie)
-        val adapter = MoviesAdapter(requireContext(), movieList)
+        adapter = MoviesAdapter(requireContext(), emptyList())
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -45,5 +47,23 @@ class MovieListFragment: Fragment() {
             toolbarColor
         )
         (activity as MainActivity).setStatusBarColor(toolbarColor)
+    }
+
+    private fun initObserver(){
+        viewModel.movieList.observe(viewLifecycleOwner) {
+            adapter.updateData(it)
+        }
+
+        viewModel.error.observe(viewLifecycleOwner) {
+            displayError(it)
+        }
+    }
+
+    private fun displayError(errorMessage: String){
+        Toast.makeText(
+            requireContext(),
+            errorMessage,
+            Toast.LENGTH_LONG
+        ).show()
     }
 }
