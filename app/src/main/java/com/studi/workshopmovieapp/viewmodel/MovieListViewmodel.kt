@@ -1,13 +1,18 @@
 package com.studi.workshopmovieapp.viewmodel
 
 import android.app.Application
-import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.studi.workshopmovieapp.database.MovieDb
+import com.studi.workshopmovieapp.database.repository.MovieDbRepository
 import com.studi.workshopmovieapp.model.Movie
-import com.studi.workshopmovieapp.repository.*
+import com.studi.workshopmovieapp.repository.EmptyListAPIResult
+import com.studi.workshopmovieapp.repository.ErrorMovieAPIResult
+import com.studi.workshopmovieapp.repository.MovieAPIResult
+import com.studi.workshopmovieapp.repository.MovieRepository
+import com.studi.workshopmovieapp.repository.SuccessMovieAPIResult
 import com.studi.workshopmovieapp.util.isOnline
 import kotlinx.coroutines.launch
 
@@ -15,7 +20,10 @@ class MovieListViewmodel(
     val app: Application
 ): AndroidViewModel(app) {
 
-    var repository: MovieRepository = MovieRepository()
+    private var repository: MovieRepository = MovieRepository()
+
+    private val movieDb by lazy { MovieDb.getDatabase(app.applicationContext) }
+    private val dbRepository by lazy { MovieDbRepository(movieDb.movieDao()) }
 
     private var _error = MutableLiveData<String>()
     var error: LiveData<String> = _error
@@ -33,7 +41,10 @@ class MovieListViewmodel(
                 val apiResult: MovieAPIResult = repository.getMovieList()
                 when(apiResult){
                     is SuccessMovieAPIResult -> {
-                        _movieList.postValue(apiResult.data)
+                        apiResult.data.apply {
+                            dbRepository.insertMovieList(this)
+                            _movieList.postValue(this)
+                        }
                     }
                     is EmptyListAPIResult -> {
                         _error.postValue(

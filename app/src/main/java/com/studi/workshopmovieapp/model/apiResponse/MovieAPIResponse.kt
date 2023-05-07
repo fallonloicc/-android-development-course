@@ -3,9 +3,7 @@ package com.studi.workshopmovieapp.model.apiResponse
 import com.google.gson.annotations.Expose
 
 import com.google.gson.annotations.SerializedName
-import com.studi.workshopmovieapp.api.MovieAPI.Companion.TMDBapiKey
 import com.studi.workshopmovieapp.model.Movie
-import com.studi.workshopmovieapp.repository.MovieRepository.Companion.BASE_URL
 import com.studi.workshopmovieapp.repository.MovieRepository.Companion.URLIMAGE
 
 

@@ -40,7 +40,7 @@ class MovieRepository {
         retrofit.create(MovieAPI::class.java)
     }
 
-    suspend fun getMovieList(): MovieAPIResult{
+    suspend fun getMovieList(): MovieAPIResult {
         return try {
             val result = movieAPI.getMovieList()
             if (result.isSuccessful){
