@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.studi.workshopmovieapp.R
 import com.studi.workshopmovieapp.model.Movie
 import com.studi.workshopmovieapp.util.getRandomColor
@@ -47,6 +48,11 @@ class MovieListFragment: Fragment() {
             toolbarColor
         )
         (activity as MainActivity).setStatusBarColor(toolbarColor)
+
+        val refreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.movie_refresh_layout)
+        refreshLayout.setOnRefreshListener {
+            viewModel.getMovieList()
+        }
     }
 
     private fun initObserver(){

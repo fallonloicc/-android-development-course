@@ -5,25 +5,38 @@ import com.studi.workshopmovieapp.model.Movie
 import com.studi.workshopmovieapp.model.dao.MovieEntity
 import com.studi.workshopmovieapp.model.dao.MovieEntity.Companion.toEntity
 import com.studi.workshopmovieapp.model.dao.MovieEntity.Companion.toModel
+import timber.log.Timber
+import java.lang.Exception
 
 class MovieDbRepository(private val movieDao: MovieDao) {
 
-    suspend fun getAllMovie(): List<Movie>{
-        val movieDbList = movieDao.getAllMovie()
+    fun getAllMovie(): List<Movie>? {
+        return try {
+            val movieDbList = movieDao.getAllMovie()
 
-        return mutableListOf<Movie>().apply {
-            movieDbList.forEach {
-                this.add(
-                    it.toModel()
-                )
+            return mutableListOf<Movie>().apply {
+                movieDbList.forEach {
+                    this.add(
+                        it.toModel()
+                    )
+                }
             }
+        }catch (e: Exception) {
+            Timber.e(e)
+            null
         }
+
     }
 
     suspend fun insertMovie(movie: Movie){
-        movieDao.insertMovie(
-            movie.toEntity()
-        )
+        try {
+            movieDao.insertMovie(
+                movie.toEntity()
+            )
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
+
     }
 
     suspend fun insertMovieList(movieList: List<Movie>){

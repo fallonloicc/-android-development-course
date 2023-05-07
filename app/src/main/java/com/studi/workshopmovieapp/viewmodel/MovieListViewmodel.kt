@@ -35,32 +35,36 @@ class MovieListViewmodel(
         getMovieList()
     }
 
-    private fun getMovieList(){
-        if (app.isOnline()){
-            viewModelScope.launch {
+    fun getMovieList(){
+        viewModelScope.launch {
+            if (app.isOnline()) {
                 val apiResult: MovieAPIResult = repository.getMovieList()
-                when(apiResult){
+                when (apiResult) {
                     is SuccessMovieAPIResult -> {
                         apiResult.data.apply {
                             dbRepository.insertMovieList(this)
                             _movieList.postValue(this)
                         }
                     }
+
                     is EmptyListAPIResult -> {
                         _error.postValue(
                             "La liste est vide"
                         )
                     }
+
                     is ErrorMovieAPIResult -> {
                         handleAPIError(apiResult)
                     }
                 }
+            } else {
+                _error.postValue(
+                    "Pas de connexion Internet"
+                )
+
+                val movieList = dbRepository.getAllMovie()
+                _movieList.postValue(movieList)
             }
-        }
-        else {
-            _error.postValue(
-                "Pas de connexion Internet"
-            )
         }
     }
 
