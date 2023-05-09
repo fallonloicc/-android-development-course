@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.studi.workshopmovieapp.database.MovieDb
+import com.studi.workshopmovieapp.database.repository.DbErrorResponse
+import com.studi.workshopmovieapp.database.repository.DbSuccessResponse
 import com.studi.workshopmovieapp.database.repository.MovieDbRepository
 import com.studi.workshopmovieapp.model.Movie
 import com.studi.workshopmovieapp.repository.EmptyListAPIResult
@@ -14,6 +16,7 @@ import com.studi.workshopmovieapp.repository.MovieAPIResult
 import com.studi.workshopmovieapp.repository.MovieRepository
 import com.studi.workshopmovieapp.repository.SuccessMovieAPIResult
 import com.studi.workshopmovieapp.util.isOnline
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MovieListViewmodel(
@@ -22,7 +25,7 @@ class MovieListViewmodel(
 
     private var repository: MovieRepository = MovieRepository()
 
-    private val movieDb by lazy { MovieDb.getDatabase(app.applicationContext) }
+    private val movieDb by lazy { MovieDb.getDatabase(app) }
     private val dbRepository by lazy { MovieDbRepository(movieDb.movieDao()) }
 
     private var _error = MutableLiveData<String>()
@@ -61,9 +64,24 @@ class MovieListViewmodel(
                 _error.postValue(
                     "Pas de connexion Internet"
                 )
+                getDbMovies()
+            }
+        }
+    }
 
-                val movieList = dbRepository.getAllMovie()
-                _movieList.postValue(movieList)
+    private fun getDbMovies() {
+        viewModelScope.launch(Dispatchers.IO) {
+            when(val movieList = dbRepository.getAllMovie()) {
+                is DbSuccessResponse -> {
+                    _movieList.postValue(
+                        movieList.data
+                    )
+                }
+                is DbErrorResponse -> {
+                    _error.postValue(
+                        movieList.exception.message ?: ""
+                    )
+                }
             }
         }
     }

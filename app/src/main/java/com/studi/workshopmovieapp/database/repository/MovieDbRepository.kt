@@ -10,25 +10,31 @@ import java.lang.Exception
 
 class MovieDbRepository(private val movieDao: MovieDao) {
 
-    fun getAllMovie(): List<Movie>? {
+    fun getAllMovie(): DbResponse {
         return try {
             val movieDbList = movieDao.getAllMovie()
 
-            return mutableListOf<Movie>().apply {
+            val movieList = mutableListOf<Movie>().apply {
                 movieDbList.forEach {
                     this.add(
                         it.toModel()
                     )
                 }
             }
+
+            DbSuccessResponse(
+                data = movieList
+            )
         }catch (e: Exception) {
             Timber.e(e)
-            null
+            DbErrorResponse(
+                exception = e
+            )
         }
 
     }
 
-    suspend fun insertMovie(movie: Movie){
+    private suspend fun insertMovie(movie: Movie){
         try {
             movieDao.insertMovie(
                 movie.toEntity()
@@ -45,3 +51,7 @@ class MovieDbRepository(private val movieDao: MovieDao) {
         }
     }
 }
+
+sealed class DbResponse()
+data class DbSuccessResponse(val data: List<Movie>): DbResponse()
+data class DbErrorResponse(val exception: Exception): DbResponse()

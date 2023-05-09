@@ -23,6 +23,9 @@ class MovieListFragment: Fragment() {
 
     lateinit var viewModel: MovieListViewmodel
     lateinit var adapter: MoviesAdapter
+
+    lateinit var refreshLayout: SwipeRefreshLayout
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -49,7 +52,7 @@ class MovieListFragment: Fragment() {
         )
         (activity as MainActivity).setStatusBarColor(toolbarColor)
 
-        val refreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.movie_refresh_layout)
+        refreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.movie_refresh_layout)
         refreshLayout.setOnRefreshListener {
             viewModel.getMovieList()
         }
@@ -58,10 +61,12 @@ class MovieListFragment: Fragment() {
     private fun initObserver(){
         viewModel.movieList.observe(viewLifecycleOwner) {
             adapter.updateData(it)
+            refreshLayout.isRefreshing = false
         }
 
         viewModel.error.observe(viewLifecycleOwner) {
             displayError(it)
+            refreshLayout.isRefreshing = false
         }
     }
 
