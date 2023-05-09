@@ -40,7 +40,7 @@ class MovieRepository {
         retrofit.create(MovieAPI::class.java)
     }
 
-    suspend fun getMovieList(): MovieAPIResult{
+    suspend fun getMovieList(): MovieAPIResult {
         return try {
             val result = movieAPI.getMovieList()
             if (result.isSuccessful){
@@ -68,6 +68,32 @@ class MovieRepository {
         }
     }
 
+    suspend fun getMovieDetails(movieId: String): MovieAPIResult {
+        return try {
+            val result = movieAPI.getMovieDetails(movieId = movieId)
+            if (result.isSuccessful){
+                result.body()?.let {
+                    SuccessMovieDetailsResult(
+                        data = it.toMovie()
+                    )
+                } ?: ErrorMovieAPIResult(code = 998, message = "Body null")
+
+            }
+            else {
+                ErrorMovieAPIResult(
+                    code = result.code(),
+                    message = result.message()
+                )
+            }
+        } catch (e: Exception) {
+            Timber.e(e)
+            ErrorMovieAPIResult(
+                code = 999,
+                message = e.message ?: ""
+            )
+        }
+    }
+
     companion object {
         const val BASE_URL: String = "https://api.themoviedb.org/3/"
         const val URLIMAGE: String = "https://image.tmdb.org/t/p/w780/"
@@ -76,5 +102,6 @@ class MovieRepository {
 
 sealed class MovieAPIResult
 data class SuccessMovieAPIResult(val data: List<Movie>): MovieAPIResult()
+data class SuccessMovieDetailsResult(val data: Movie): MovieAPIResult()
 object EmptyListAPIResult: MovieAPIResult()
 data class ErrorMovieAPIResult(val code: Int, val message: String): MovieAPIResult()

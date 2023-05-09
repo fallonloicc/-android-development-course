@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
+import android.media.Image
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,13 +22,14 @@ import com.studi.workshopmovieapp.util.getColorByOrder
 import com.studi.workshopmovieapp.view.fragment.MovieListFragmentDirections
 
 
-class MoviesAdapter(private val context: Context, private val movieList: List<Movie>): RecyclerView.Adapter<MoviesAdapter.ViewHolder>() {
+class MoviesAdapter(private val context: Context, movieList: List<Movie>): RecyclerView.Adapter<MoviesAdapter.ViewHolder>() {
 
     var list = movieList
 
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         val imageView: ImageView = itemView.findViewById(R.id.item_poster)
         val textView: TextView = itemView.findViewById(R.id.item_title)
+        val arrow: ImageView = itemView.findViewById(R.id.navigate_arrow)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -49,10 +51,9 @@ class MoviesAdapter(private val context: Context, private val movieList: List<Mo
             .load(movie.posterUrl)
             .into(holder.imageView)
 
-        holder.itemView.setOnClickListener {
+        holder.arrow.setOnClickListener {
             val action = MovieListFragmentDirections.actionMovieListFragmentToMovieDetail(
-                movieTitle = movie.title,
-                movieDescr = movie.descr
+                movieId = movie.id
             )
             it.findNavController().navigate(action)
         }

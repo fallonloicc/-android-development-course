@@ -32,4 +32,6 @@ class MainActivity : AppCompatActivity() {
     fun setStatusBarColor(color: Int) {
         window.statusBarColor = color
     }
+
+    fun getStatusBarColor() =  window.statusBarColor
 }
