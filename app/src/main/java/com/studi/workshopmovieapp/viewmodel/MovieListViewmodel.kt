@@ -15,6 +15,7 @@ import com.studi.workshopmovieapp.repository.ErrorMovieAPIResult
 import com.studi.workshopmovieapp.repository.MovieAPIResult
 import com.studi.workshopmovieapp.repository.MovieRepository
 import com.studi.workshopmovieapp.repository.SuccessMovieAPIResult
+import com.studi.workshopmovieapp.repository.SuccessMovieDetailsResult
 import com.studi.workshopmovieapp.util.isOnline
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,9 +35,8 @@ class MovieListViewmodel(
     private var _movieList = MutableLiveData<List<Movie>>()
     var movieList: LiveData<List<Movie>> = _movieList
 
-    init {
-        getMovieList()
-    }
+    private var _movieDetails = MutableLiveData<Movie>()
+    var movieDetails: LiveData<Movie> = _movieDetails
 
     fun getMovieList(){
         viewModelScope.launch {
@@ -49,16 +49,15 @@ class MovieListViewmodel(
                             _movieList.postValue(this)
                         }
                     }
-
                     is EmptyListAPIResult -> {
                         _error.postValue(
                             "La liste est vide"
                         )
                     }
-
                     is ErrorMovieAPIResult -> {
                         handleAPIError(apiResult)
                     }
+                    else -> {}
                 }
             } else {
                 _error.postValue(
@@ -82,6 +81,20 @@ class MovieListViewmodel(
                         movieList.exception.message ?: ""
                     )
                 }
+            }
+        }
+    }
+
+    fun getMovieDetails(movieId: String) {
+        viewModelScope.launch {
+            when(val movieDetails = repository.getMovieDetails(movieId)){
+                is SuccessMovieDetailsResult -> {
+                    _movieDetails.postValue(movieDetails.data)
+                }
+                is ErrorMovieAPIResult -> {
+                    _error.postValue(movieDetails.message)
+                }
+                else -> {}
             }
         }
     }

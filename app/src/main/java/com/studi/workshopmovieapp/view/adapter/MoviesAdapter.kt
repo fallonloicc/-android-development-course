@@ -22,7 +22,7 @@ import com.studi.workshopmovieapp.util.getColorByOrder
 import com.studi.workshopmovieapp.view.fragment.MovieListFragmentDirections
 
 
-class MoviesAdapter(private val context: Context, private val movieList: List<Movie>): RecyclerView.Adapter<MoviesAdapter.ViewHolder>() {
+class MoviesAdapter(private val context: Context, movieList: List<Movie>): RecyclerView.Adapter<MoviesAdapter.ViewHolder>() {
 
     var list = movieList
 
@@ -53,8 +53,7 @@ class MoviesAdapter(private val context: Context, private val movieList: List<Mo
 
         holder.arrow.setOnClickListener {
             val action = MovieListFragmentDirections.actionMovieListFragmentToMovieDetail(
-                movieTitle = movie.title,
-                movieDescr = movie.descr
+                movieId = movie.id
             )
             it.findNavController().navigate(action)
         }

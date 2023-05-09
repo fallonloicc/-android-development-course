@@ -39,6 +39,7 @@ class MovieListFragment: Fragment() {
 
         viewModel = MovieListViewmodel(app = requireActivity().application)
         initObserver()
+        viewModel.getMovieList()
 
         val recyclerView = view.findViewById<RecyclerView>(com.studi.workshopmovieapp.R.id.recycler_movie)
         adapter = MoviesAdapter(requireContext(), emptyList())
