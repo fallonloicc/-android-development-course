@@ -15,6 +15,7 @@ import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.BitmapImageViewTarget
 import com.studi.workshopmovieapp.R
 import com.studi.workshopmovieapp.model.Movie
@@ -25,6 +26,8 @@ import com.studi.workshopmovieapp.view.fragment.MovieListFragmentDirections
 class MoviesAdapter(private val context: Context, movieList: List<Movie>): RecyclerView.Adapter<MoviesAdapter.ViewHolder>() {
 
     var list = movieList
+
+    lateinit var movieSelectedListener: MovieSelectedListener
 
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         val imageView: ImageView = itemView.findViewById(R.id.item_poster)
@@ -47,15 +50,19 @@ class MoviesAdapter(private val context: Context, movieList: List<Movie>): Recyc
         val movie = list[position]
         holder.textView.text = movie.title
 
-        Glide.with(context)
-            .load(movie.posterUrl)
-            .into(holder.imageView)
+        holder.imageView.apply {
+            transitionName = movie.posterUrl
+            Glide.with(context)
+                .load(movie.posterUrl)
+                .apply(RequestOptions.circleCropTransform())
+                .into(holder.imageView)
+        }
 
         holder.arrow.setOnClickListener {
-            val action = MovieListFragmentDirections.actionMovieListFragmentToMovieDetail(
-                movieId = movie.id
+            movieSelectedListener.onMovieSelected(
+                movie = movie,
+                imageView = holder.imageView
             )
-            it.findNavController().navigate(action)
         }
     }
 
@@ -63,4 +70,8 @@ class MoviesAdapter(private val context: Context, movieList: List<Movie>): Recyc
         list = movieList
         notifyDataSetChanged()
     }
+}
+
+interface MovieSelectedListener {
+    fun onMovieSelected(movie: Movie, imageView: ImageView)
 }

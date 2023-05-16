@@ -21,6 +21,12 @@
                 android:name="movieId"
                 app:argType="string"
                 android:defaultValue=""/>
+
+            <argument
+                android:name="uri"
+                app:argType="string"
+                app:nullable="true"
+                android:defaultValue="null" />
         </action>
     </fragment>
     <fragment
@@ -32,6 +38,11 @@
             android:name="movieId"
             app:argType="string"
             android:defaultValue=""/>
+        <argument
+            android:name="uri"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="null" />
     </fragment>
 
 

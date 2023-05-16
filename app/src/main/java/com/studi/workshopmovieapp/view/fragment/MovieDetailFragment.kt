@@ -10,7 +10,9 @@ import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
+import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.studi.workshopmovieapp.R
 import com.studi.workshopmovieapp.model.Movie
 import com.studi.workshopmovieapp.view.activity.MainActivity
@@ -32,6 +34,11 @@ class MovieDetailFragment: Fragment() {
         return inflater.inflate(R.layout.fragment_movie_detail, container, false)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        sharedElementEnterTransition = TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -42,10 +49,19 @@ class MovieDetailFragment: Fragment() {
             (activity as MainActivity).getStatusBarColor()
         )
 
+        val poster = view.findViewById<ImageView>(R.id.movie_details_poster)
+        poster.apply {
+            transitionName = args.uri
+            Glide.with(context)
+                .load(args.uri)
+                .apply(RequestOptions.circleCropTransform())
+                .into(this)
+        }
+
         viewModel = MovieListViewmodel(app = requireActivity().application)
         initObserver()
 
-        viewModel.getMovieDetails(args.movieId)
+//        viewModel.getMovieDetails(args.movieId)
     }
 
     private fun initObserver() {

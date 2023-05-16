@@ -23,7 +23,7 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/movie_details_poster"
-        android:layout_width="wrap_content"
+        android:layout_width="250dp"
         android:layout_height="250dp"
         android:padding="24dp"
         android:src="@drawable/movie_icon_black"
